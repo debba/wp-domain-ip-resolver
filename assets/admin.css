@@ -1,0 +1,31 @@
+.fdm-table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 700px;
+}
+
+.fdm-table th,
+.fdm-table td {
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: left;
+}
+
+.fdm-table th {
+    background: #f7f7f7;
+}
+
+.fdm-add-row {
+    margin: 10px 0;
+}
+
+.fdm-remove-row {
+    color: #b00;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.fdm-error {
+    color: red;
+    margin-top: 5px;
+}
