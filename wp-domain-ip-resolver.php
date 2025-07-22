@@ -33,6 +33,8 @@ add_action('admin_enqueue_scripts', function ($hook) {
         'invalidIpText' => __('invalid IP', 'wp-domain-ip-resolver'),
         'duplicateText' => __('duplicate domain:port', 'wp-domain-ip-resolver'),
         'fixErrorsText' => __('Please fix errors before saving!', 'wp-domain-ip-resolver'),
+        'removeText' => __('Remove this mapping', 'wp-domain-ip-resolver'),
+        'savedText' => __('Settings saved successfully!', 'wp-domain-ip-resolver'),
     ]);
 });
 
@@ -41,13 +43,21 @@ function fdm_admin_page()
     ?>
     <div class="wrap">
         <h1><?php _e('Domain IP Resolver', 'wp-domain-ip-resolver'); ?></h1>
-        <form method="post" action="options.php">
-            <?php
-            settings_fields('fdm_settings_group');
-            do_settings_sections('forced-dns-mapper');
-            submit_button();
-            ?>
-        </form>
+        <div class="fdm-card">
+            <div class="fdm-section-header">
+                <h2 class="fdm-section-title"><?php _e('Domain Mapping Configuration', 'wp-domain-ip-resolver'); ?></h2>
+            </div>
+            <form method="post" action="options.php">
+                <?php
+                settings_fields('fdm_settings_group');
+                do_settings_sections('forced-dns-mapper');
+                submit_button();
+                ?>
+            </form>
+        </div>
+        <div class="fdm-dark-mode-toggle" id="fdm-dark-mode-toggle" title="<?php _e('Toggle Dark Mode', 'wp-domain-ip-resolver'); ?>">
+            <span class="fdm-dark-icon">🌙</span>
+        </div>
     </div>
     <?php
 }
@@ -55,9 +65,9 @@ function fdm_admin_page()
 add_action('admin_init', function () {
     register_setting('fdm_settings_group', 'fdm_hosts_mapping');
 
-    add_settings_section('fdm_main_section', __('Domain Mapping', 'wp-domain-ip-resolver'), [], 'forced-dns-mapper');
+    add_settings_section('fdm_main_section', '', [], 'forced-dns-mapper');
 
-    add_settings_field('fdm_hosts_mapping_field', __('Domains & IPs', 'wp-domain-ip-resolver'), 'fdm_render_field', 'forced-dns-mapper', 'fdm_main_section');
+    add_settings_field('fdm_hosts_mapping_field', '', 'fdm_render_field', 'forced-dns-mapper', 'fdm_main_section');
 });
 
 function fdm_render_field()
@@ -84,25 +94,25 @@ function fdm_render_field()
                 <th><?php _e('Domain', 'wp-domain-ip-resolver'); ?></th>
                 <th><?php _e('Port', 'wp-domain-ip-resolver'); ?></th>
                 <th><?php _e('IP Address', 'wp-domain-ip-resolver'); ?></th>
-                <th><?php _e('Remove', 'wp-domain-ip-resolver'); ?></th>
+                <th><?php _e('Actions', 'wp-domain-ip-resolver'); ?></th>
             </tr>
         </thead>
         <tbody>
             <?php if ($rows):
                 foreach ($rows as $row): ?>
                     <tr>
-                        <td><input type="text" class="fdm-host" value="<?php echo $row['host']; ?>" /></td>
-                        <td><input type="number" class="fdm-port" min="1" max="65535" value="<?php echo $row['port']; ?>" /></td>
-                        <td><input type="text" class="fdm-ip" value="<?php echo $row['ip']; ?>" /></td>
-                        <td><span class="fdm-remove-row">&times;</span></td>
+                        <td><input type="text" class="fdm-host" placeholder="example.com" value="<?php echo $row['host']; ?>" /></td>
+                        <td><input type="number" class="fdm-port" min="1" max="65535" placeholder="443" value="<?php echo $row['port']; ?>" /></td>
+                        <td><input type="text" class="fdm-ip" placeholder="192.168.1.1" value="<?php echo $row['ip']; ?>" /></td>
+                        <td><span class="fdm-remove-row" title="<?php _e('Remove this mapping', 'wp-domain-ip-resolver'); ?>">&times;</span></td>
                     </tr>
                 <?php endforeach; endif; ?>
         </tbody>
     </table>
-    <button type="button" class="button fdm-add-row"><?php _e('Add Row', 'wp-domain-ip-resolver'); ?></button>
+    <button type="button" class="button fdm-add-row"><?php _e('Add New Mapping', 'wp-domain-ip-resolver'); ?></button>
     <input type="hidden" name="fdm_hosts_mapping" id="fdm_hosts_mapping" />
     <div class="fdm-error" id="fdm-error"></div>
-    <p class="description"><?php _e('Configure domain, port and IP mappings. No duplicate domain:port combinations allowed. Data will be saved as JSON.', 'wp-domain-ip-resolver'); ?></p>
+    <p class="description"><?php _e('Configure domain-to-IP mappings for HTTP requests. Each domain:port combination must be unique. Perfect for testing, development environments, and load balancing scenarios.', 'wp-domain-ip-resolver'); ?></p>
     <?php
     // Server-side validation (in case of manual manipulation)
     $is_valid = json_decode($data, true);
